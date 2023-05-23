@@ -1,0 +1,14 @@
+composer.lock
+composer.phar
+vendor/*
+.env
+.phpunit.result.cache
+/.idea
+/.vscode
+*/.DS_Store/*
+.DS_Store
+*.ipr
+*.iws
+.idea
+*.iml
+*plugin.xml

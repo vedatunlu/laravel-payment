@@ -1,0 +1,43 @@
+{
+    "name": "vedatunlu/payment",
+    "description": "Payment systems api integration for Laravel",
+    "type": "library",
+    "keywords": ["laravel-payment", "laravel-sipay", "payment-inttegration"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vedat Ünlü",
+            "email": "vedatunlu10@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Unlu\\PaymentPackage\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Unlu\\PaymentPackage\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0",
+        "phpunit/phpunit": "^10.1",
+        "mockery/mockery": "^1.5"
+    },
+    "require": {
+        "ext-openssl": "*",
+        "guzzlehttp/guzzle": "^7.7"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test -f": "vendor/bin/phpunit --filter"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Unlu\\PaymentPackage\\PaymentPackageServiceProvider"
+            ]
+        }
+    }
+}
