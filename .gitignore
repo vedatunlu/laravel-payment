@@ -12,3 +12,4 @@ vendor/*
 .idea
 *.iml
 *plugin.xml
+.phpunit.cache
