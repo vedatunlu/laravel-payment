@@ -3,7 +3,7 @@
 namespace Unlu\PaymentPackage;
 
 use Illuminate\Support\Facades\App;
-use Unlu\PaymentPackage\Contracts\PaymentGateway;
+use Unlu\PaymentPackage\Abstract\PaymentGateway;
 use Unlu\PaymentPackage\Exceptions\InvalidGatewayException;
 use Unlu\PaymentPackage\Gateways\SipayPaymentGateway;
 
