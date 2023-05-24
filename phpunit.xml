@@ -10,7 +10,7 @@
     <env name="DB_CONNECTION" value="testing"/>
     <env name="APP_KEY" value="base64:2fl+Ktvkfl+Fuz4Qp/A75G2RTiWVA/ZoKZvp6fiiM10="/>
     <env name="APP_DEBUG" value="true"/>
-    <env name="SIPAY_HOST" value="https://provisioning.sipay.com.tr/ccpayment"/>
+    <env name="SIPAY_HOST" value="https://provisioning.sipay.com.tr"/>
     <env name="SIPAY_MERCHANT_ID" value="18309"/>
     <env name="SIPAY_MERCHANT_KEY" value="$2y$10$HmRgYosneqcwHj.UH7upGuyCZqpQ1ITgSMj9Vvxn.t6f.Vdf2SQFO"/>
     <env name="SIPAY_APP_KEY" value="6d4a7e9374a76c15260fcc75e315b0b9"/>

@@ -2,7 +2,7 @@
     "name": "vedatunlu/payment",
     "description": "Payment systems api integration for Laravel",
     "type": "library",
-    "keywords": ["laravel-payment", "laravel-sipay", "payment-inttegration"],
+    "keywords": ["payment", "sipay"],
     "license": "MIT",
     "authors": [
         {
