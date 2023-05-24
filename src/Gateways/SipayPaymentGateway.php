@@ -4,12 +4,16 @@ namespace Unlu\PaymentPackage\Gateways;
 
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
-use Unlu\PaymentPackage\Contracts\AbstractPaymentGatewayInterface;
+use Unlu\PaymentPackage\Abstract\PaymentGateway;
+use Unlu\PaymentPackage\Contracts\Installable;
+use Unlu\PaymentPackage\Contracts\PaymentGatewayResponse;
+use Unlu\PaymentPackage\Contracts\Refundable;
+use Unlu\PaymentPackage\Contracts\Walletable;
 use Unlu\PaymentPackage\Payloads\SipayPayload;
 use Unlu\PaymentPackage\Responses\SipayResponse;
 use Unlu\PaymentPackage\Exceptions\AuthTokenException;
 
-class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInterface
+class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundable, Installable
 {
     /**
      * @var string
@@ -24,7 +28,7 @@ class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInte
     /**
      * @var string
      */
-    private string $bearerToken;
+    protected string $authToken;
 
     /**
      * @var SipayPayload
@@ -36,16 +40,14 @@ class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInte
      */
     protected PendingRequest $client;
 
-    /**
-     * @throws AuthTokenException
-     */
     public function __construct(SipayPayload $payload, PendingRequest $client, $appSecret, $appKey)
     {
+        $this->client = $client;
         $this->appSecret = $appSecret;
         $this->appKey = $appKey;
         $this->payload = $payload;
-        $this->client = $client;
-        $this->bearerToken = $this->getAuthToken();
+        parent::__construct();
+
     }
 
     /**
@@ -56,7 +58,7 @@ class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInte
      */
     public function getCards(array $params): SipayResponse
     {
-        $response = $this->client->acceptJson()->withToken($this->bearerToken)
+        $response = $this->client->acceptJson()->withToken($this->authToken)
             ->withBody(json_encode($this->payload->setData($params)->toArray()), 'application/json')
             ->get('ccpayment/api/getCardTokens');
 
@@ -64,36 +66,40 @@ class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInte
     }
 
     /**
+     * Save credit cards on sipay host
+     *
      * @param  array $params
      * @return SipayResponse
      */
     public function saveCard(array $params): SipayResponse {
-        $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/saveCard', $this->payload->setData($params)->addSaveCardHashKey()->toArray());
 
         return new SipayResponse($response);
     }
 
     /**
+     * Update credit cards on sipay host
+     *
      * @param  array $params
      * @return SipayResponse
      */
     public function updateCard(array $params): SipayResponse {
-        $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/editCard', $this->payload->setData($params)->addUpdateCardHashKey()->toArray());
 
         return new SipayResponse($response);
     }
 
     /**
-     * Delete stored credit cards for given customer
+     * Delete stored credit cards for given customer on sipay host
      *
      * @param  array $params
      * @return SipayResponse
      */
     public function deleteCard(array $params): SipayResponse
     {
-        $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/deleteCard', $this->payload->setData($params)->addDeleteCardHashKey()->toArray());
 
         return new SipayResponse($response);
@@ -105,9 +111,9 @@ class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInte
      * @param  array $params
      * @return SipayResponse
      */
-    public function payWith3DS(array $params): SipayResponse
+    public function payWith3D(array $params): SipayResponse
     {
-        $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/paySmart3D', $this->payload->setData($params)->addPaymentHashKey()->toArray());
 
         return new SipayResponse($response);
@@ -120,7 +126,7 @@ class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInte
      * @return SipayResponse
      */
     public function payWithSavedCard(array $params): SipayResponse {
-        $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/payByCardToken', $this->payload->setData($params)->addPaymentHashKey()->toArray());
 
         return new SipayResponse($response);
@@ -134,7 +140,7 @@ class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInte
      */
     public function refund(array $params): SipayResponse
     {
-        $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/refund', $this->payload->setData($params)->addRefundHashKey()->toArray());
 
         return new SipayResponse($response);
@@ -158,5 +164,19 @@ class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInte
         }
 
         return Cache::get('sipay_token');
+    }
+
+    /**
+     * Make a request to inquiry installment for given credit card
+     *
+     * @param array $params
+     * @return PaymentGatewayResponse
+     */
+    public function installmentInquiry(array $params): PaymentGatewayResponse
+    {
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
+            ->post('ccpayment/api/getpos', $this->payload->setData($params)->toArray());
+
+        return new SipayResponse($response);
     }
 }
