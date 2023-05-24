@@ -1,0 +1,19 @@
+{
+    "status_code": 100,
+    "status_description": "Data fetched successfully",
+    "data": [
+        {
+            "id": 11,
+            "pos_id": 0,
+            "card_token": "KELUUKPQBCGYLV7FP7I7VUQNZP7N5UX7JUCPKZVOPKEMCEQP",
+            "merchant_id": 98950,
+            "customer_number": 5070,
+            "customer_name": "Vedat Ünlü",
+            "customer_email": "Vedat Ünlü",
+            "customer_phone": 8801749452019,
+            "bin": 540668,
+            "created_at": "2021-04-08T14:07:42.000000Z",
+            "updated_at": "2021-04-08T14:07:42.000000Z"
+        }
+    ]
+}

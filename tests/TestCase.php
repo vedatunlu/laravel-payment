@@ -18,18 +18,4 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'Unlu\PaymentPackage\PaymentPackageServiceProvider',
         ];
     }
-
-    /**
-     * Override application aliases.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     *
-     * @return array<string, class-string<\Illuminate\Support\Facades\Facade>>
-     */
-    protected function getPackageAliases($app)
-    {
-        return [
-            'Payment' => 'Unlu\PaymentPackage\Facade',
-        ];
-    }
 }
