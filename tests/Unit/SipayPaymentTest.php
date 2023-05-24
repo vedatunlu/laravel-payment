@@ -80,7 +80,7 @@ class SipayPaymentTest extends TestCase
             '*' => Http::response("<form>form</form>", 200)
         ]);
         $response = Payment::gateway('sipay')
-            ->payWith3DS([
+            ->payWith3D([
             'cc_holder_name' => 'Vedat Ünlü',
             'cc_no' => '4508034508034509',
             'expiry_month' => '12',
@@ -150,6 +150,20 @@ class SipayPaymentTest extends TestCase
                 'refund_transaction_id' => 's2345g54h3ıh'
             ]);
         $this->assertEquals($this->jsonToArray('refund_response.json'), $response->toArray());
+    }
+
+    public function test_installment_inquiry_method()
+    {
+        $this->mockResponse('installment_inquiry_response.json', 'ccpayment/api/getpos');
+        $response = Payment::gateway('sipay')
+            ->installmentInquiry([
+                "credit_card" => "534261",
+                "amount" => 248.5,
+                "currency_code" => "TRY",
+                "is_recurring" => 0,
+                "is_2d" => 0
+            ]);
+        $this->assertEquals($this->jsonToArray('installment_inquiry_response.json'), $response->toArray());
     }
 
     public function test_payment_factory_with_invalid_gateway()

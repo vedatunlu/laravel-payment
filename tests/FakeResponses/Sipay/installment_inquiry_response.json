@@ -1,0 +1,20 @@
+{
+    "status_code": 100,
+    "status_description": "Successfull",
+    "data": {
+        "pos_id": 65,
+        "campaign_id": 0,
+        "allocation_id": 0,
+        "installments_number": 1,
+        "card_type": "CREDIT CARD",
+        "card_program": "BONUS",
+        "payable_amount": 248,
+        "hash_key": "77190be0fea77b1b:c6cc:NBq3GfN2uqyoTw1ISUEXDWB90wpSdKLfRHt__f5v9A1",
+        "amount_to_be_paid": 248,
+        "currency_code": "TRY",
+        "currency_id": 1,
+        "title": "Single payment",
+        "maturity_period": "1 // Bu alan yalnızca tarım kartları için döner",
+        "payment_frequency": "1 // Bu alan yalnızca tarım kartları için döner"
+    }
+}
