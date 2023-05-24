@@ -4,6 +4,7 @@ namespace Unlu\PaymentPackage\Contracts;
 
 interface PaymentGatewayResponse
 {
+
     public function getHttpStatusCode(): int;
 
     public function isSuccess(): bool;
