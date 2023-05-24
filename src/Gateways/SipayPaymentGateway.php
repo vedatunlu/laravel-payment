@@ -11,12 +11,6 @@ use Unlu\PaymentPackage\Exceptions\AuthTokenException;
 
 class SipayPaymentGateway implements PaymentGateway
 {
-
-    /**
-     * @var string
-     */
-    private string $baseUrl;
-
     /**
      * @var string
      */
@@ -47,12 +41,11 @@ class SipayPaymentGateway implements PaymentGateway
      */
     public function __construct(SipayPayload $payload, PendingRequest $client)
     {
-        $this->baseUrl = config('sipay.credentials.host');
         $this->appSecret = config('sipay.credentials.app_secret');
         $this->appKey = config('sipay.credentials.app_key');
-        $this->bearerToken = $this->getAuthToken();
         $this->payload = $payload;
         $this->client = $client;
+        $this->bearerToken = $this->getAuthToken();
     }
 
     /**
@@ -65,9 +58,9 @@ class SipayPaymentGateway implements PaymentGateway
     {
         $response = $this->client->acceptJson()->withToken($this->bearerToken)
             ->withBody(json_encode($this->payload->setData($params)->toArray()), 'application/json')
-            ->get("{$this->baseUrl}/api/getCardTokens");
+            ->get('ccpayment/api/getCardTokens');
 
-        return new SipayResponse($response->json(), $response->status());
+        return new SipayResponse($response);
     }
 
     /**
@@ -76,10 +69,9 @@ class SipayPaymentGateway implements PaymentGateway
      */
     public function saveCard(array $params): SipayResponse {
         $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
-            ->post("{$this->baseUrl}/api/saveCard",
-                $this->payload->setData($params)->addSaveCardHashKey()->toArray());
+            ->post('ccpayment/api/saveCard', $this->payload->setData($params)->addSaveCardHashKey()->toArray());
 
-        return new SipayResponse($response->json(), $response->status());
+        return new SipayResponse($response);
     }
 
     /**
@@ -88,10 +80,9 @@ class SipayPaymentGateway implements PaymentGateway
      */
     public function updateCard(array $params): SipayResponse {
         $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
-            ->post("{$this->baseUrl}/api/editCard",
-                $this->payload->setData($params)->addUpdateCardHashKey()->toArray());
+            ->post('ccpayment/api/editCard', $this->payload->setData($params)->addUpdateCardHashKey()->toArray());
 
-        return new SipayResponse($response->json(), $response->status());
+        return new SipayResponse($response);
     }
 
     /**
@@ -103,10 +94,9 @@ class SipayPaymentGateway implements PaymentGateway
     public function deleteCard(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
-            ->post("{$this->baseUrl}/api/deleteCard",
-                $this->payload->setData($params)->addDeleteCardHashKey()->toArray());
+            ->post('ccpayment/api/deleteCard', $this->payload->setData($params)->addDeleteCardHashKey()->toArray());
 
-        return new SipayResponse($response->json(), $response->status());
+        return new SipayResponse($response);
     }
 
     /**
@@ -118,10 +108,9 @@ class SipayPaymentGateway implements PaymentGateway
     public function payWith3DS(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
-            ->post("{$this->baseUrl}/api/paySmart3D",
-                $this->payload->setData($params)->addPaymentHashKey()->toArray());
+            ->post('ccpayment/api/paySmart3D', $this->payload->setData($params)->addPaymentHashKey()->toArray());
 
-        return new SipayResponse($response->body(), $response->status());
+        return new SipayResponse($response);
     }
 
     /**
@@ -132,10 +121,9 @@ class SipayPaymentGateway implements PaymentGateway
      */
     public function payWithSavedCard(array $params): SipayResponse {
         $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
-            ->post("{$this->baseUrl}/api/payByCardToken",
-                $this->payload->setData($params)->addPaymentHashKey()->toArray());
+            ->post('ccpayment/api/payByCardToken', $this->payload->setData($params)->addPaymentHashKey()->toArray());
 
-        return new SipayResponse($response->body(), $response->status());
+        return new SipayResponse($response);
     }
 
     /**
@@ -147,10 +135,9 @@ class SipayPaymentGateway implements PaymentGateway
     public function refund(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->bearerToken)
-            ->post("{$this->baseUrl}/api/refund",
-                $this->payload->setData($params)->addRefundHashKey()->toArray());
+            ->post('ccpayment/api/refund', $this->payload->setData($params)->addRefundHashKey()->toArray());
 
-        return new SipayResponse($response->json(), $response->status());
+        return new SipayResponse($response);
     }
 
     /**
@@ -159,11 +146,10 @@ class SipayPaymentGateway implements PaymentGateway
      * @return string
      * @throws AuthTokenException
      */
-    private function getAuthToken(): string
+    protected function getAuthToken(): string
     {
         if (is_null(Cache::get('sipay_token'))) {
-            $response = $this->client->acceptJson()->contentType('application/json')
-                ->post("{$this->baseUrl}/api/token", [
+            $response = $this->client->acceptJson()->contentType('application/json')->post('ccpayment/api/token', [
                     'app_id' => $this->appKey,
                     'app_secret' => $this->appSecret,
                 ]);
