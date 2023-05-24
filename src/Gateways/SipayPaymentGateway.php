@@ -4,12 +4,12 @@ namespace Unlu\PaymentPackage\Gateways;
 
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
-use Unlu\PaymentPackage\Contracts\PaymentGateway;
+use Unlu\PaymentPackage\Contracts\AbstractPaymentGatewayInterface;
 use Unlu\PaymentPackage\Payloads\SipayPayload;
 use Unlu\PaymentPackage\Responses\SipayResponse;
 use Unlu\PaymentPackage\Exceptions\AuthTokenException;
 
-class SipayPaymentGateway implements PaymentGateway
+class SipayAbstractPaymentGatewayInterface implements AbstractPaymentGatewayInterface
 {
     /**
      * @var string
