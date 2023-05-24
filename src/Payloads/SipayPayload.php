@@ -23,10 +23,10 @@ class SipayPayload implements PaymentPayload
      */
     protected SipayHashKeyGenerator $hashKeyGenerator;
 
-    public function __construct(SipayHashKeyGenerator $hashKeyGenerator)
+    public function __construct(SipayHashKeyGenerator $hashKeyGenerator, $merchantKey)
     {
         $this->hashKeyGenerator = $hashKeyGenerator;
-        $this->merchantKey = config('sipay.credentials.merchant_key');
+        $this->merchantKey = $merchantKey;
     }
 
     public function setData(array $data = []): self

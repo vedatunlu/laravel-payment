@@ -39,10 +39,10 @@ class SipayPaymentGateway implements PaymentGateway
     /**
      * @throws AuthTokenException
      */
-    public function __construct(SipayPayload $payload, PendingRequest $client)
+    public function __construct(SipayPayload $payload, PendingRequest $client, $appSecret, $appKey)
     {
-        $this->appSecret = config('sipay.credentials.app_secret');
-        $this->appKey = config('sipay.credentials.app_key');
+        $this->appSecret = $appSecret;
+        $this->appKey = $appKey;
         $this->payload = $payload;
         $this->client = $client;
         $this->bearerToken = $this->getAuthToken();

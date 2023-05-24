@@ -20,13 +20,16 @@ class PaymentPackageServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/sipay.php', 'sipay');
         $this->app->bind(SipayPayload::class, function (Application $app) {
-            return new SipayPayload($app->make(SipayHashKeyGenerator::class));
+            $merchantKey = config('sipay.credentials.merchant_key');
+            return new SipayPayload($app->make(SipayHashKeyGenerator::class), $merchantKey);
         });
         $this->app->bind(SipayPaymentGateway::class, function (Application $app) {
+            $appSecret = config('sipay.credentials.app_secret');
+            $appKey = config('sipay.credentials.app_key');
             $client = Http::withOptions([
                 'base_uri' => config('sipay.credentials.host')
             ]);
-            return new SipayPaymentGateway($app->make(SipayPayload::class), $client);
+            return new SipayPaymentGateway($app->make(SipayPayload::class), $client, $appSecret, $appKey);
         });
     }
 
