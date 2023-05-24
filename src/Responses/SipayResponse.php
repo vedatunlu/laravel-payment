@@ -2,31 +2,25 @@
 
 namespace Unlu\PaymentPackage\Responses;
 
+use Illuminate\Http\Client\Response;
 use Unlu\PaymentPackage\Contracts\PaymentGatewayResponse;
 use Unlu\PaymentPackage\Exceptions\InvalidResponseException;
 
 class SipayResponse implements PaymentGatewayResponse
 {
     /**
-     * @var array|string
+     * @var Response
      */
-    protected array|string $data;
+    protected mixed $response;
 
     /**
      * @var int
      */
     public int $httpStatusCode;
 
-    /**
-     * Initialize object class with i
-     *
-     * @param  array|string  $data
-     * @param  int  $httpStatusCode
-     */
-    public function __construct(array|string $data, int $httpStatusCode)
+    public function __construct(Response $response)
     {
-        $this->data = $data;
-        $this->httpStatusCode = $httpStatusCode;
+        $this->response = $response;
     }
 
     /**
@@ -36,7 +30,7 @@ class SipayResponse implements PaymentGatewayResponse
      */
     public function getStatusCode(): int
     {
-        return $this->data['status_code'];
+        return $this->response->json('status_code');
     }
 
     /**
@@ -46,7 +40,7 @@ class SipayResponse implements PaymentGatewayResponse
      */
     public function getStatusDescription(): string
     {
-        return $this->data['status_description'];
+        return $this->response->json('status_description');
     }
 
     /**
@@ -54,7 +48,7 @@ class SipayResponse implements PaymentGatewayResponse
      */
     public function getHttpStatusCode(): int
     {
-        return $this->httpStatusCode;
+        return $this->response->status();
     }
 
     /**
@@ -64,8 +58,8 @@ class SipayResponse implements PaymentGatewayResponse
      */
     public function isSuccess(): bool
     {
-        return ($this->data['status_code'] === 100 || $this->data['status_code'] === 101)
-            && ($this->httpStatusCode < 300 && $this->httpStatusCode >= 200);
+        return ($this->response->json('status_code') === 100 || $this->response->json('status_code') === 101)
+            && ($this->getHttpStatusCode() < 300 && $this->getStatusCode() >= 200);
     }
 
     /**
@@ -76,11 +70,11 @@ class SipayResponse implements PaymentGatewayResponse
      */
     public function get3DSForm(): string
     {
-        if (is_array($this->data)) {
+        if (is_array($this->response->json())) {
             throw new InvalidResponseException('Response is not a html form');
         }
 
-        return $this->data;
+        return $this->response->body();
     }
 
     /**
@@ -90,6 +84,6 @@ class SipayResponse implements PaymentGatewayResponse
      */
     public function toArray(): array
     {
-        return $this->data;
+        return $this->response->json();
     }
 }
