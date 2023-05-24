@@ -4,7 +4,7 @@ namespace Unlu\PaymentPackage;
 
 use Illuminate\Support\Facades\App;
 use Unlu\PaymentPackage\Contracts\PaymentGateway;
-use Unlu\PaymentPackage\Exceptions\InvalidChannelNameException;
+use Unlu\PaymentPackage\Exceptions\InvalidGatewayException;
 use Unlu\PaymentPackage\Gateways\SipayPaymentGateway;
 
 final class Payment
@@ -18,12 +18,12 @@ final class Payment
      *
      * @param  string  $gateway
      * @return PaymentGateway
-     * @throws InvalidChannelNameException
+     * @throws InvalidGatewayException
      */
     public static function gateway(string $gateway): PaymentGateway
     {
         if (!array_key_exists($gateway, self::$gateWays)) {
-            throw new InvalidChannelNameException('Invalid gateway');
+            throw new InvalidGatewayException('Invalid gateway');
         }
 
         return App::make(self::$gateWays[$gateway]);
