@@ -2,10 +2,9 @@
 
 namespace Unlu\PaymentPackage;
 
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Http\Client\PendingRequest;
-use Illuminate\Http\Client\Factory as Http;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 use Unlu\PaymentPackage\Gateways\SipayPaymentGateway;
 use Unlu\PaymentPackage\Helpers\SipayHashKeyGenerator;
 use Unlu\PaymentPackage\Payloads\SipayPayload;
@@ -24,7 +23,10 @@ class PaymentPackageServiceProvider extends ServiceProvider
             return new SipayPayload($app->make(SipayHashKeyGenerator::class));
         });
         $this->app->bind(SipayPaymentGateway::class, function (Application $app) {
-            return new SipayPaymentGateway($app->make(SipayPayload::class), $app->make(PendingRequest::class));
+            $client = Http::withOptions([
+                'base_uri' => config('sipay.credentials.host')
+            ]);
+            return new SipayPaymentGateway($app->make(SipayPayload::class), $client);
         });
     }
 
