@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://img.shields.io/badge/latest-v1.0.0-brightgreen" alt="Latest version">
+    <img src="https://img.shields.io/packagist/v/vedatunlu/payment" alt="Latest version">
     <img src="https://img.shields.io/badge/licence-MIT-green" alt="Licence">
 </p>
 
