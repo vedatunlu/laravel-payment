@@ -2,9 +2,6 @@
 
 namespace Unlu\PaymentPackage\Helpers;
 
-/**
- *
- */
 final class SipayHashKeyValidator
 {
 

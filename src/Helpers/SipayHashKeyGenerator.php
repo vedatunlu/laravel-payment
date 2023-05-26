@@ -2,9 +2,8 @@
 
 namespace Unlu\PaymentPackage\Helpers;
 
-/**
- *
- */
+use Unlu\PaymentPackage\Payloads\SipayPayload;
+
 final class SipayHashKeyGenerator
 {
     /**
@@ -19,111 +18,71 @@ final class SipayHashKeyGenerator
 
     public function __construct()
     {
-        $this->merchantKey = config('sipay.credentials.merchant_key');
-        $this->appSecret = config('sipay.credentials.app_secret');
+        $this->merchantKey = config('payment.sipay.credentials.merchant_key');
+        $this->appSecret = config('payment.sipay.credentials.app_secret');
     }
 
     /**
      * Generate hash key for payment
      *
-     * @param  float  $total
-     * @param  int  $installment
-     * @param  string  $currency_code
-     * @param  string  $invoice_id
+     * @param  SipayPayload  $payload
      * @return string
      */
-    public function generatePaymentHashKey(float $total, int $installment, string $currency_code, string $invoice_id,): string {
-        $data = $total.'|'.$installment.'|'.$currency_code.'|'.$this->merchantKey.'|'.$invoice_id;
-        $iv = substr(sha1((string) mt_rand()), 0, 16);
-        $password = sha1($this->appSecret);
-        $salt = substr(sha1((string) mt_rand()), 0, 4);
-        $saltWithPassword = hash('sha256', $password.$salt);
-        $encrypted = openssl_encrypt("$data", 'aes-256-cbc', "$saltWithPassword", null, $iv);
-        $msgEncryptedBundle = "$iv:$salt:$encrypted";
+    public function paymentHashKey(SipayPayload $payload): string {
+        $str = $payload->getData('total').'|'.$payload->getData('installment_numbers')
+            .'|'.$payload->getData('currency_code').'|'.$this->merchantKey.'|'.$payload->getData('invoice_id');
 
-        return str_replace('/', '__', $msgEncryptedBundle);
+        return $this->stringToHashedKey($str);
     }
 
     /**
      * Generate hash key for saving credit cards
      *
-     * @param  int  $customerNumber
-     * @param  int  $cardNumber
-     * @param  string  $cardHolderName
-     * @param  int  $expiryMonth
-     * @param  int  $expiryYear
+     * @param  SipayPayload  $payload
      * @return string
      */
-    public function generateSaveCardHashKey(int $customerNumber, int $cardNumber, string $cardHolderName, int $expiryMonth, int $expiryYear,): string {
-        $data = $this->merchantKey.'|'.$customerNumber.'|'.$cardHolderName.'|'.$cardNumber.'|'.$expiryMonth.'|'.$expiryYear;
-        $iv = substr(sha1((string) mt_rand()), 0, 16);
-        $password = sha1($this->appSecret);
-        $salt = substr(sha1((string) mt_rand()), 0, 4);
-        $saltWithPassword = hash('sha256', $password.$salt);
-        $encrypted = openssl_encrypt("$data", 'aes-256-cbc', "$saltWithPassword", 0, $iv);
-        $msgEncryptedBundle = "$iv:$salt:$encrypted";
+    public function saveCardHashKey(SipayPayload $payload): string {
+        $str = $this->merchantKey.'|'.$payload->getData('customer_number').'|'.$payload->getData('card_holder_name')
+            .'|'.$payload->getData('card_number').'|'.$payload->getData('expiry_month').'|'.$payload->getData('expiry_year');
 
-        return str_replace('/', '__', $msgEncryptedBundle);
+        return $this->stringToHashedKey($str);
     }
 
     /**
      * Generate hash key for updating credit cards
      *
-     * @param  int  $customerNumber
-     * @param  string  $cardToken
+     * @param  SipayPayload  $payload
      * @return string
      */
-    public function generateUpdateCardHashKey(int $customerNumber, string $cardToken): string {
-        $data = $this->merchantKey.'|'.$customerNumber.'|'.$cardToken;
-        $iv = substr(sha1(mt_rand()), 0, 16);
-        $password = sha1($this->appSecret);
-        $salt = substr(sha1(mt_rand()), 0, 4);
-        $saltWithPassword = hash('sha256', $password.$salt);
-        $encrypted = openssl_encrypt("$data", 'aes-256-cbc', "$saltWithPassword", null, $iv);
-        $msg_encrypted_bundle = "$iv:$salt:$encrypted";
-        $msg_encrypted_bundle = str_replace('/', '__', $msg_encrypted_bundle);
-
-        return $msg_encrypted_bundle;
-    }
-
-    /**
-     * Generate hash key for deleting credit cards
-     *
-     * @param  int  $customerNumber
-     * @param  string  $cardToken
-     * @return string
-     */
-    public function generateDeleteCardHashKey(int $customerNumber, string $cardToken,): string {
-        $data = $this->merchantKey.'|'.$customerNumber.'|'.$cardToken;
-        $iv = substr(sha1((string) mt_rand()), 0, 16);
-        $password = sha1($this->appSecret);
-        $salt = substr(sha1((string) mt_rand()), 0, 4);
-        $saltWithPassword = hash('sha256', $password.$salt);
-        $encrypted = openssl_encrypt("$data", 'aes-256-cbc', "$saltWithPassword", 0, $iv);
-        $msg_encrypted_bundle = "$iv:$salt:$encrypted";
-
-        return str_replace('/', '__', $msg_encrypted_bundle);
+    public function storedCardHashKey(SipayPayload $payload): string {
+        $str = $this->merchantKey.'|'.$payload->getData('customer_number').'|'.$payload->getData('card_token');
+        return $this->stringToHashedKey($str);
     }
 
     /**
      * Generate hash key for refund
      *
-     * @param  float  $amount
-     * @param  string  $invoiceId
+     * @param  SipayPayload $payload
      * @return string
      */
-    public function generateRefundHashKey(float $amount, string $invoiceId,): string {
-        $data = $amount.'|'.$invoiceId.'|'.$this->merchantKey;
-        $iv = substr(sha1((string) mt_rand()), 0, 16);
-        $password = sha1($this->appSecret);
-        $salt = substr(sha1((string) mt_rand()), 0, 4);
-        $saltWithPassword = hash('sha256', $password.$salt);
-        $encrypted = openssl_encrypt(
-            "$data", 'aes-256-cbc', "$saltWithPassword", 0, $iv
-        );
-        $msg_encrypted_bundle = "$iv:$salt:$encrypted";
-        $hash_key = str_replace('/', '__', $msg_encrypted_bundle);
+    public function refundHashKey(SipayPayload $payload): string {
+        $str = $payload->getData('amount').'|'.$payload->getData('invoice_id').'|'.$this->merchantKey;
+        return $this->stringToHashedKey($str);
+    }
 
-        return $hash_key;
+    /**
+     * @param string $str
+     * @return string
+     */
+    protected function stringToHashedKey(string $str): string
+    {
+        $iv = substr(sha1((string)mt_rand()), 0, 16);
+        $password = sha1($this->appSecret);
+        $salt = substr(sha1((string)mt_rand()), 0, 4);
+        $saltWithPassword = hash('sha256', $password . $salt);
+        $encrypted = openssl_encrypt("$str", 'aes-256-cbc', "$saltWithPassword", 0, $iv);
+        $msgEncryptedBundle = "$iv:$salt:$encrypted";
+
+        return str_replace('/', '__', $msgEncryptedBundle);
     }
 }
