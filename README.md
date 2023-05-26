@@ -13,17 +13,15 @@ application.
 
 - Easy integration with various payment gateways
 - Easy usage with Payment client class
-- Automated payment processing
-- Refund management
--
-- Documentation and code examples
+- Wallet usage with available payment gateways
+- 
 
 ## Installation
 
 1. Use Composer to add the Laravel Payment package to your project:
 
 ```bash
-    composer require vedatunlu/laravel-payment
+    composer require vedatunlu/payment
 ```
 
 2. Package service providers will be discovered by your laravel project automatically. So you don't need to update your
@@ -162,6 +160,16 @@ Please check out the table given below to get basic knowledge of the Payment cla
     
     return $response->toArray(); // get response as array
 ```
+
+4. Validate Incoming Sipay Hash key:
+
+You can easily validate hash keys returned from sipay gateway using SipayHashKeyValidator class.
+
+```php
+    SipayHashKeyValidator::validateHashKey($hashKey, $appSecret);
+```
+
+This method returns array including status, total amount, invoice id, order id, currency code if key is valid. If not method will be returned false.
 
 # Contributing to the package
 
