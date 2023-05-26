@@ -58,8 +58,9 @@ class SipayResponse implements PaymentGatewayResponse
      */
     public function isSuccess(): bool
     {
-        return ($this->response->json('status_code') === 100 || $this->response->json('status_code') === 101)
-            && ($this->getHttpStatusCode() < 300 && $this->getStatusCode() >= 200);
+        return ($this->getHttpStatusCode() < 300 && $this->getHttpStatusCode() >= 200)
+            || (!is_null($this->response->json('status_code'))
+                && in_array($this->response->json('status_code'), [100, 101]));
     }
 
     /**
@@ -70,7 +71,7 @@ class SipayResponse implements PaymentGatewayResponse
      */
     public function get3DSForm(): string
     {
-        if (is_array($this->response->json())) {
+        if (!$this->isSuccess() || is_array($this->response->json())) {
             throw new InvalidResponseException('Response is not a html form');
         }
 
