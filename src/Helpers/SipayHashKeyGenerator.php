@@ -29,7 +29,7 @@ final class SipayHashKeyGenerator
      * @return string
      */
     public function paymentHashKey(SipayPayload $payload): string {
-        $str = $payload->getData('total').'|'.$payload->getData('installment_numbers')
+        $str = $payload->getData('total').'|'.$payload->getData('installments_number')
             .'|'.$payload->getData('currency_code').'|'.$this->merchantKey.'|'.$payload->getData('invoice_id');
 
         return $this->stringToHashedKey($str);
@@ -80,7 +80,7 @@ final class SipayHashKeyGenerator
         $password = sha1($this->appSecret);
         $salt = substr(sha1((string)mt_rand()), 0, 4);
         $saltWithPassword = hash('sha256', $password . $salt);
-        $encrypted = openssl_encrypt("$str", 'aes-256-cbc', "$saltWithPassword", 0, $iv);
+        $encrypted = openssl_encrypt("$str", 'aes-256-cbc', "$saltWithPassword", null, $iv);
         $msgEncryptedBundle = "$iv:$salt:$encrypted";
 
         return str_replace('/', '__', $msgEncryptedBundle);

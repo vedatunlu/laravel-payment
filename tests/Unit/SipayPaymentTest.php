@@ -9,6 +9,8 @@ use Unlu\PaymentPackage\Tests\TestCase;
 
 class SipayPaymentTest extends TestCase
 {
+    protected $baseUrl;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -18,7 +20,7 @@ class SipayPaymentTest extends TestCase
     private function mockResponse(string $fileName, $path): void
     {
         Http::fake([
-            config('sipay.credentials.host').'/'.$path => Http::response($this->jsonToArray($fileName), 200)
+            $this->baseUrl.'/'.$path => Http::response($this->jsonToArray($fileName), 200)
         ]);
     }
 
@@ -54,7 +56,7 @@ class SipayPaymentTest extends TestCase
         $this->mockResponse('update_cards_response.json', 'ccpayment/api/editCard');
         $response = Payment::gateway('sipay')
             ->updateCard([
-                'card_token' => 'WNPDZDQNMVNRQO23IAHKDKXIWCRGWHEXCFNRDXXK5CMXGM5A',
+                'card_token' => '4a1ef584c391ef0e4246cd758ef3a325',
                 'customer_number' => 123123,
                 'expiry_month' => 12,
                 'expiry_year' => 2026,
@@ -68,7 +70,7 @@ class SipayPaymentTest extends TestCase
         $this->mockResponse('delete_cards_response.json', 'ccpayment/api/deleteCard');
         $response = Payment::gateway('sipay')
             ->deleteCard([
-                'card_token' => 'WNPDZDQNMVNRQO23IAHKDKXIWCRGWHEXCFNRDXXK5CMXGM5A',
+                'card_token' => '4a1ef584c391ef0e4246cd758ef3a325',
                 'customer_number' => 123123
             ]);
         $this->assertEquals($this->jsonToArray('delete_cards_response.json'), $response->toArray());
@@ -77,7 +79,7 @@ class SipayPaymentTest extends TestCase
     public function test_pay_with_3DS_method()
     {
         Http::fake([
-            '*' => Http::response("<form>form</form>", 200)
+            $this->baseUrl => Http::response("<form>form</form>", 200)
         ]);
         $response = Payment::gateway('sipay')
             ->payWith3D([
@@ -112,11 +114,15 @@ class SipayPaymentTest extends TestCase
     public function test_pay_with_saved_card_method()
     {
         Http::fake([
-            config('sipay.credentials.host').'api/payByCardToken' => Http::response("<form>form</form>", 200)
+            $this->baseUrl.'api/payByCardToken' => Http::response("<form>form</form>", 200)
         ]);
         $response = Payment::gateway('sipay')
             ->payWithSavedCard([
-                'card_token' => 'WNPDZDQNMVNRQO23IAHKDKXIWCRGWHEXCFNRDXXK5CMXGM5A',
+                'card_token' => '448335b16c6a3b6bc04aca61cdc55ae5sdf',
+                'customer_number' => 123123,
+                'customer_name' => 'Vedat Ünlü',
+                'customer_email' => 'vedatunlu10@gmail.com',
+                'customer_phone' => '+905532054660',
                 'currency_code' => 'TRY',
                 'installments_number' => 1,
                 'invoice_id' => rand(100000, 999999),
