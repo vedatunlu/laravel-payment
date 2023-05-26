@@ -18,16 +18,16 @@ class PaymentPackageServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/sipay.php', 'sipay');
+        $this->mergeConfigFrom(__DIR__.'/../config/payment.php', 'payment');
         $this->app->bind(SipayPayload::class, function (Application $app) {
-            $merchantKey = config('sipay.credentials.merchant_key');
+            $merchantKey = config('payment.sipay.credentials.merchant_key');
             return new SipayPayload($app->make(SipayHashKeyGenerator::class), $merchantKey);
         });
         $this->app->bind(SipayPaymentGateway::class, function (Application $app) {
-            $appSecret = config('sipay.credentials.app_secret');
-            $appKey = config('sipay.credentials.app_key');
+            $appSecret = config('payment.sipay.credentials.app_secret');
+            $appKey = config('payment.sipay.credentials.app_key');
             $client = Http::withOptions([
-                'base_uri' => config('sipay.credentials.host')
+                'base_uri' => config('payment.sipay.credentials.host')
             ]);
             return new SipayPaymentGateway($app->make(SipayPayload::class), $client, $appSecret, $appKey);
         });
@@ -41,8 +41,8 @@ class PaymentPackageServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/sipay.php' => config_path('sipay.php')
-            ], 'config');
+                __DIR__.'/../config/payment.php.php' => config_path('payment.php')
+            ], 'payment-config');
         }
     }
 }
