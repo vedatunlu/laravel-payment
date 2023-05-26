@@ -41,7 +41,7 @@ class PaymentPackageServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/payment.php.php' => config_path('payment.php')
+                __DIR__.'/../config/payment.php' => config_path('payment.php')
             ], 'payment-config');
         }
     }
