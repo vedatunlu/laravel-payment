@@ -2,7 +2,8 @@
     "name": "vedatunlu/payment",
     "description": "Payment systems api integration for Laravel",
     "type": "library",
-    "keywords": ["payment", "sipay"],
+    "keywords": ["payment", "sipay", "pay"],
+    "homepage": "https://github.com/vedatunlu/laravel-payment",
     "license": "MIT",
     "authors": [
         {
@@ -22,12 +23,13 @@
     },
     "require-dev": {
         "orchestra/testbench": "^8.0",
-        "phpunit/phpunit": "^10.1",
-        "mockery/mockery": "^1.5"
+        "phpunit/phpunit": "^10.1"
     },
     "require": {
-        "php": ">=7.4",
-        "guzzlehttp/guzzle": "^7.7"
+        "php": ">=8.0",
+        "guzzlehttp/guzzle": "^7.7",
+        "ext-openssl": "*",
+        "ext-json": "*"
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
