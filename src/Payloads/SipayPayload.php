@@ -27,16 +27,16 @@ class SipayPayload implements PaymentPayload
     {
         $this->hashKeyGenerator = $hashKeyGenerator;
         $this->merchantKey = $merchantKey;
+        $this->addData('merchant_key', $this->merchantKey);
     }
 
     public function setData(array $data = []): self
     {
-        $this->data = $data;
-        $this->addData('merchant_key', $this->merchantKey);
+        $this->data = array_merge($data, $this->data);
         return $this;
     }
 
-    protected function getData(string $key): mixed
+    public function getData(string $key): mixed
     {
         return $this->data[$key] ?? null;
     }
@@ -51,7 +51,6 @@ class SipayPayload implements PaymentPayload
     public function addData(string $key, mixed $value): self
     {
         $this->data[$key] = $value;
-
         return $this;
     }
 
@@ -64,62 +63,26 @@ class SipayPayload implements PaymentPayload
     public function removeData(string $key): self
     {
         unset($this->data[$key]);
-
         return $this;
     }
 
-    public function addSaveCardHashKey(): self
+    /**
+     * @param string $type
+     * @return self
+     */
+    public function addHashKey(string $type): self
     {
-        $this->data['hash_key'] = $this->hashKeyGenerator->generateSaveCardHashKey(
-            $this->getData('customer_number'),
-            $this->getData('card_number'),
-            $this->getData('card_holder_name'),
-            $this->getData('expiry_month'),
-            $this->getData('expiry_year'),
-        );
+        $hashKey = match ($type) {
+            'payment' => $this->hashKeyGenerator->paymentHashKey($this),
+            'saveCard' => $this->hashKeyGenerator->saveCardHashKey($this),
+            'updateCard', 'deleteCard' => $this->hashKeyGenerator->storedCardHashKey($this),
+            'refund' => $this->hashKeyGenerator->refundHashKey($this)
+        };
+
+        $this->addData('hash_key', $hashKey);
 
         return $this;
     }
-
-    public function addUpdateCardHashKey(): self
-    {
-        $this->data['hash_key'] = $this->hashKeyGenerator->generateUpdateCardHashKey(
-            $this->getData('customer_number'), $this->getData('card_token')
-        );
-        return $this;
-    }
-
-    public function addDeleteCardHashKey(): self
-    {
-        $this->data['hash_key'] = $this->hashKeyGenerator->generateDeleteCardHashKey(
-            $this->getData('customer_number'),
-            $this->getData('card_token'),
-        );
-
-        return $this;
-    }
-
-    public function addPaymentHashKey(): self
-    {
-        $this->data['hash_key'] = $this->hashKeyGenerator->generatePaymentHashKey(
-            $this->getData('total'),
-            $this->getData('installments_number'),
-            $this->getData('currency_code'),
-            $this->getData('invoice_id'),
-        );
-
-        return $this;
-    }
-
-    public function addRefundHashKey(): self
-    {
-        $this->data['hash_key'] = $this->hashKeyGenerator->generateRefundHashKey(
-            $this->getData('amount'), $this->getData('invoice_id'),
-        );
-
-        return $this;
-    }
-
     /**
      * Returns payload data as an array.
      *
