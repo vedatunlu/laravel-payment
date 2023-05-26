@@ -7,7 +7,7 @@ interface PaymentPayload
 
     public function toArray(): array;
 
-    public function setData(array $data): self;
+    public function setData(array $data = []): self;
 
     public function addData(string $key, mixed $value): self;
 
