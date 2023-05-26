@@ -47,7 +47,6 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
         $this->appKey = $appKey;
         $this->payload = $payload;
         parent::__construct();
-
     }
 
     /**
@@ -73,7 +72,7 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
      */
     public function saveCard(array $params): SipayResponse {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
-            ->post('ccpayment/api/saveCard', $this->payload->setData($params)->addSaveCardHashKey()->toArray());
+            ->post('ccpayment/api/saveCard', $this->payload->setData($params)->addHashKey('saveCard')->toArray());
 
         return new SipayResponse($response);
     }
@@ -81,12 +80,12 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
     /**
      * Update credit cards on sipay host
      *
-     * @param  array $params
+     * @param array $params
      * @return SipayResponse
      */
     public function updateCard(array $params): SipayResponse {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
-            ->post('ccpayment/api/editCard', $this->payload->setData($params)->addUpdateCardHashKey()->toArray());
+            ->post('ccpayment/api/editCard', $this->payload->setData($params)->addHashKey('updateCard')->toArray());
 
         return new SipayResponse($response);
     }
@@ -100,7 +99,7 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
     public function deleteCard(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
-            ->post('ccpayment/api/deleteCard', $this->payload->setData($params)->addDeleteCardHashKey()->toArray());
+            ->post('ccpayment/api/deleteCard', $this->payload->setData($params)->addHashKey('deleteCard')->toArray());
 
         return new SipayResponse($response);
     }
@@ -114,7 +113,7 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
     public function payWith3D(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
-            ->post('ccpayment/api/paySmart3D', $this->payload->setData($params)->addPaymentHashKey()->toArray());
+            ->post('ccpayment/api/paySmart3D', $this->payload->setData($params)->addHashKey('payment')->toArray());
 
         return new SipayResponse($response);
     }
@@ -127,7 +126,7 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
      */
     public function payWithSavedCard(array $params): SipayResponse {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
-            ->post('ccpayment/api/payByCardToken', $this->payload->setData($params)->addPaymentHashKey()->toArray());
+            ->post('ccpayment/api/payByCardToken', $this->payload->setData($params)->addHashKey('payment')->toArray());
 
         return new SipayResponse($response);
     }
@@ -141,7 +140,7 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
     public function refund(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
-            ->post('ccpayment/api/refund', $this->payload->setData($params)->addRefundHashKey()->toArray());
+            ->post('ccpayment/api/refund', $this->payload->setData($params)->addHashKey('refund')->toArray());
 
         return new SipayResponse($response);
     }
