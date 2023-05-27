@@ -4,7 +4,7 @@ namespace Unlu\PaymentPackage\Gateways;
 
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
-use Unlu\PaymentPackage\Abstract\PaymentGateway;
+use Unlu\PaymentPackage\Abstracts\PaymentGateway;
 use Unlu\PaymentPackage\Contracts\Installable;
 use Unlu\PaymentPackage\Contracts\PaymentGatewayResponse;
 use Unlu\PaymentPackage\Contracts\Refundable;
@@ -24,11 +24,6 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
      * @var string
      */
     private string $appKey;
-
-    /**
-     * @var string
-     */
-    protected string $authToken;
 
     /**
      * @var SipayPayload

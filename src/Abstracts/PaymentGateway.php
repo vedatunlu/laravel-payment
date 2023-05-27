@@ -1,6 +1,6 @@
 <?php
 
-namespace Unlu\PaymentPackage\Abstract;
+namespace Unlu\PaymentPackage\Abstracts;
 
 use Unlu\PaymentPackage\Contracts\PaymentGatewayResponse;
 
@@ -13,7 +13,7 @@ abstract class PaymentGateway
         $this->authToken = $this->getAuthToken();
     }
 
-    protected abstract function getAuthToken(): string;
+    abstract protected function getAuthToken(): string;
 
-    public abstract function payWith3D(array $params): PaymentGatewayResponse;
+    abstract public function payWith3D(array $params): PaymentGatewayResponse;
 }
