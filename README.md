@@ -79,13 +79,23 @@ Please check out the table given below to get basic knowledge of the Payment cla
         <td>Sipay</td>
     </tr>
     <tr>
+        <td>payWith2D</td>
+        <td>Start a 2D payment with given credit card for given customer info</td>
+        <td>Sipay</td>
+    </tr>
+    <tr>
         <td>payWith3D</td>
-        <td>Start a payment with given credit card for given customer info</td>
+        <td>Start a 3D payment with given credit card for given customer info</td>
         <td>Sipay</td>
     </tr>
     <tr>
         <td>payWithSavedCard</td>
         <td>Start a payment with stored credit card on the payment gateway host</td>
+        <td>Sipay</td>
+    </tr>
+    <tr>
+        <td>verifyPayment</td>
+        <td>Make a verification request for given payment</td>
         <td>Sipay</td>
     </tr>
     <tr>
@@ -96,6 +106,11 @@ Please check out the table given below to get basic knowledge of the Payment cla
     <tr>
         <td>installmentInquiry</td>
         <td>Make an installment inquiry request for given credit card</td>
+        <td>Sipay</td>
+    </tr>
+    <tr>
+        <td>transactionStatus</td>
+        <td>Check all processed transaction's status</td>
         <td>Sipay</td>
     </tr>
 </table>
