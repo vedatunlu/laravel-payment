@@ -1,0 +1,18 @@
+{
+    "status_code": 100,
+    "status_description": "Payment process successful",
+    "data": {
+        "sipay_status": 1,
+        "order_no": 163525516519858,
+        "order_id": 163525516519858,
+        "invoice_id": "WY3DNAFYAPHGLLW-1635254737",
+        "sipay_payment_method": 1,
+        "credit_card_no": "450803****4509",
+        "transaction_type": "Auth",
+        "payment_status": 1,
+        "payment_method": 1,
+        "error_code": 100,
+        "error": "",
+        "hash_key": "4ea56231a2897254:d835:m6mCUrjBMKu2EpkS70AUqpEAFCH0sMVtBw+O6__jIAUHEkDpvHlnc__Uj+sLfzeDTdf2iaL14qwmjeBJdskGp0zg=="
+    }
+}
