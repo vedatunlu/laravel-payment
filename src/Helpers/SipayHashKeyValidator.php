@@ -2,24 +2,35 @@
 
 namespace Unlu\PaymentPackage\Helpers;
 
-final class SipayHashKeyValidator
+use Unlu\PaymentPackage\Contracts\PaymentGatewayValidation;
+
+final class SipayHashKeyValidator implements PaymentGatewayValidation
 {
+
+    /**
+     * @var string
+     */
+    protected string $appSecret;
+
+    public function __construct($appSecret)
+    {
+        $this->appSecret = $appSecret;
+    }
 
     /**
      * Validate incoming hash key
      *
      * @param  string  $hashKey
-     * @param  string  $appSecret
      * @return array|false
      */
-    public static function validateHashKey(string $hashKey, string $appSecret): array|false
+    public function validateHashKey(string $hashKey): array|false
     {
         $status = $currencyCode = "";
         $total = $invoiceId = $orderId = 0;
 
         if (!empty($hashKey)) {
             $hashKey = str_replace('__', '/', $hashKey);
-            $password = sha1($appSecret);
+            $password = sha1($this->appSecret);
 
             $components = explode(':', $hashKey);
             if (count($components) > 2) {

@@ -16,10 +16,10 @@ final class SipayHashKeyGenerator
      */
     private string $appSecret;
 
-    public function __construct()
+    public function __construct(string $merchantKey, string $appSecret)
     {
-        $this->merchantKey = config('payment.sipay.credentials.merchant_key');
-        $this->appSecret = config('payment.sipay.credentials.app_secret');
+        $this->merchantKey = $merchantKey;
+        $this->appSecret = $appSecret;
     }
 
     /**
