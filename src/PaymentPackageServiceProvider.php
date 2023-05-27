@@ -20,6 +20,11 @@ class PaymentPackageServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/payment.php', 'payment');
+        $this->app->bind(SipayHashKeyGenerator::class, function (Application $app) {
+            $merchantKey = config('payment.sipay.credentials.merchant_key');
+            $appSecret = config('payment.sipay.credentials.app_secret');
+            return new SipayHashKeyGenerator($merchantKey, $appSecret);
+        });
         $this->app->bind(SipayHashKeyValidator::class, function (Application $app) {
             $appSecret = config('payment.sipay.credentials.app_secret');
             return new SipayHashKeyValidator($appSecret);
