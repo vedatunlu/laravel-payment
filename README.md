@@ -1,6 +1,10 @@
 <p align="center">
-    <img src="https://img.shields.io/packagist/v/vedatunlu/payment" alt="Latest version">
-    <img src="https://img.shields.io/badge/licence-MIT-green" alt="Licence">
+    <img src="https://img.shields.io/packagist/v/vedatunlu/payment">
+    <img src="https://img.shields.io/packagist/dm/vedatunlu/payment">
+    <img src="https://img.shields.io/github/repo-size/vedatunlu/laravel-payment">
+    <img src="https://img.shields.io/github/last-commit/vedatunlu/laravel-payment">
+    <img src="https://img.shields.io/github/release-date/vedatunlu/laravel-payment">
+    <img src="https://img.shields.io/badge/licence-MIT-green">
 </p>
 
 # Laravel Payment
