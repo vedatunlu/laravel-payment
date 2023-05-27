@@ -4,6 +4,7 @@ namespace Unlu\PaymentPackage\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
 use Unlu\PaymentPackage\Exceptions\InvalidGatewayException;
+use Unlu\PaymentPackage\Exceptions\InvalidGatewayValidatorException;
 use Unlu\PaymentPackage\Payment;
 use Unlu\PaymentPackage\Tests\TestCase;
 
@@ -78,9 +79,9 @@ class SipayPaymentTest extends TestCase
 
     public function test_pay_with_3DS_method()
     {
-        Http::fake([
+        /*Http::fake([
             $this->baseUrl => Http::response("<form>form</form>", 200)
-        ]);
+        ]);*/
         $response = Payment::gateway('sipay')
             ->payWith3D([
             'cc_holder_name' => 'Vedat Ünlü',
@@ -176,5 +177,17 @@ class SipayPaymentTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $this->assertThrows(fn () => Payment::gateway('test'), InvalidGatewayException::class);
+    }
+
+    public function test_payment_validator_method_with_valid_gateway()
+    {
+        $hashKey = '4cce8ad2aa98d2a6:f318:eur9Zwx6Tkya3Ek5Az15mYVuoAbYjNvc93Kf5D2ISms1GSaR9gVz7opUuUArAFDqHzp+EZ63Zfxt__xfbk2a+y8u5otXHr89zNv2VzGzJrL4=';
+        $response = Payment::validate('sipay', $hashKey);
+        $this->assertArrayHasKey('status', $response);
+    }
+
+    public function test_payment_validator_method_with_invalid_gateway()
+    {
+        $this->assertThrows(fn () => Payment::validate('test', 'test'), InvalidGatewayValidatorException::class);
     }
 }
