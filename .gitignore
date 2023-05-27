@@ -13,3 +13,4 @@ vendor/*
 *.iml
 *plugin.xml
 .phpunit.cache
+phpunit.xml
