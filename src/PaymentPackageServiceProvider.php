@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Foundation\Application;
 use Unlu\PaymentPackage\Gateways\SipayPaymentGateway;
 use Unlu\PaymentPackage\Helpers\SipayHashKeyGenerator;
+use Unlu\PaymentPackage\Helpers\SipayHashKeyValidator;
 use Unlu\PaymentPackage\Payloads\SipayPayload;
 
 class PaymentPackageServiceProvider extends ServiceProvider
@@ -19,6 +20,10 @@ class PaymentPackageServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/payment.php', 'payment');
+        $this->app->bind(SipayHashKeyValidator::class, function (Application $app) {
+            $appSecret = config('payment.sipay.credentials.app_secret');
+            return new SipayHashKeyValidator($appSecret);
+        });
         $this->app->bind(SipayPayload::class, function (Application $app) {
             $merchantKey = config('payment.sipay.credentials.merchant_key');
             return new SipayPayload($app->make(SipayHashKeyGenerator::class), $merchantKey);
