@@ -1,6 +1,10 @@
 <p align="center">
-    <img src="https://img.shields.io/packagist/v/vedatunlu/payment" alt="Latest version">
-    <img src="https://img.shields.io/badge/licence-MIT-green" alt="Licence">
+    <img src="https://img.shields.io/packagist/v/vedatunlu/payment">
+    <img src="https://img.shields.io/packagist/dm/vedatunlu/payment">
+    <img src="https://img.shields.io/github/repo-size/vedatunlu/laravel-payment">
+    <img src="https://img.shields.io/github/last-commit/vedatunlu/laravel-payment">
+    <img src="https://img.shields.io/github/release-date/vedatunlu/laravel-payment">
+    <img src="https://img.shields.io/badge/licence-MIT-green">
 </p>
 
 # Laravel Payment
@@ -14,7 +18,8 @@ application.
 - Easy integration with various payment gateways
 - Easy usage with Payment client class
 - Wallet usage with available payment gateways
-- 
+- Easy validation for hash keys within incoming error or success callback request, webhooks etc.
+- Multiple usage with available gateways and its methods.
 
 ## Installation
 
@@ -74,13 +79,23 @@ Please check out the table given below to get basic knowledge of the Payment cla
         <td>Sipay</td>
     </tr>
     <tr>
+        <td>payWith2D</td>
+        <td>Start a 2D payment with given credit card for given customer info</td>
+        <td>Sipay</td>
+    </tr>
+    <tr>
         <td>payWith3D</td>
-        <td>Start a payment with given credit card for given customer info</td>
+        <td>Start a 3D payment with given credit card for given customer info</td>
         <td>Sipay</td>
     </tr>
     <tr>
         <td>payWithSavedCard</td>
         <td>Start a payment with stored credit card on the payment gateway host</td>
+        <td>Sipay</td>
+    </tr>
+    <tr>
+        <td>verifyPayment</td>
+        <td>Make a verification request for given payment</td>
         <td>Sipay</td>
     </tr>
     <tr>
@@ -91,6 +106,11 @@ Please check out the table given below to get basic knowledge of the Payment cla
     <tr>
         <td>installmentInquiry</td>
         <td>Make an installment inquiry request for given credit card</td>
+        <td>Sipay</td>
+    </tr>
+    <tr>
+        <td>transactionStatus</td>
+        <td>Check all processed transaction's status</td>
         <td>Sipay</td>
     </tr>
 </table>
@@ -163,10 +183,14 @@ Please check out the table given below to get basic knowledge of the Payment cla
 
 4. Validate Incoming Sipay Hash key:
 
-You can easily validate hash keys returned from sipay gateway using SipayHashKeyValidator class.
+You can easily validate hash keys returned from sipay gateway using Payment::validate($hashKey).
 
 ```php
-    SipayHashKeyValidator::validateHashKey($hashKey, $appSecret);
+    $hashKey = $request->input('hash_key');
+    
+    if (!Payment::validate('sipay', $hashKey)) {
+        return back()->with('error', 'Invalid hash key');
+    }
 ```
 
 This method returns array including status, total amount, invoice id, order id, currency code if key is valid. If not method will be returned false.

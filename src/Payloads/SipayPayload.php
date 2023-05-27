@@ -76,7 +76,9 @@ class SipayPayload implements PaymentPayload
             'payment' => $this->hashKeyGenerator->paymentHashKey($this),
             'saveCard' => $this->hashKeyGenerator->saveCardHashKey($this),
             'updateCard', 'deleteCard' => $this->hashKeyGenerator->storedCardHashKey($this),
-            'refund' => $this->hashKeyGenerator->refundHashKey($this)
+            'refund' => $this->hashKeyGenerator->refundHashKey($this),
+            'verification' => $this->hashKeyGenerator->paymentVerificationHashKey($this),
+            'transaction' => $this->hashKeyGenerator->transactionStatusHashKey($this)
         };
 
         $this->addData('hash_key', $hashKey);

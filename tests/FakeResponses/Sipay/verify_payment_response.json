@@ -1,0 +1,7 @@
+{
+    "status_code": 100,
+    "status_description": "An order has been taken place for this invoice id: 33491162435928\n",
+    "transaction_status": "Completed",
+    "order_id": 162435932934307,
+    "invoice_id": 33491162435928
+}
