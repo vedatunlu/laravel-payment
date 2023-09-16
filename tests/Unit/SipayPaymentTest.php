@@ -16,6 +16,7 @@ class SipayPaymentTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->baseUrl = config('payment.sipay.credentials.host');
     }
 
     private function authMock(): void
