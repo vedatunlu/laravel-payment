@@ -153,7 +153,7 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
                     'app_id' => $this->appKey,
                     'app_secret' => $this->appSecret,
                 ]);
-            if (!$response->successful()) throw new AuthTokenException($response->body());
+            if (!$response->successful() || !$response->json('data.token')) throw new AuthTokenException($response->body());
             Cache::put('sipay_token', $response->json('data.token'), $response->json('data.expires_at'));
         }
 
