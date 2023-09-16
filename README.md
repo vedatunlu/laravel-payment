@@ -182,7 +182,7 @@ This method returns array including status, total amount, invoice id, order id, 
 
 # Contributing to the package
 
-We welcome and appreciate your contributions to the package! The contribution guide can be found [here](https://github.com/vedatunlu/laravel-payment/blob/master/CONTRIBUE.md).
+We welcome and appreciate your contributions to the package! The contribution guide can be found [here](https://github.com/vedatunlu/laravel-payment/blob/master/CONTRIBUTE.md).
 
 ## License
 
