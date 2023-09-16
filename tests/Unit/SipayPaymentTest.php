@@ -3,6 +3,7 @@
 namespace Unlu\PaymentPackage\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
+use Unlu\PaymentPackage\Exceptions\AuthTokenException;
 use Unlu\PaymentPackage\Exceptions\InvalidGatewayException;
 use Unlu\PaymentPackage\Exceptions\InvalidGatewayValidatorException;
 use Unlu\PaymentPackage\Payment;
@@ -16,13 +17,17 @@ class SipayPaymentTest extends TestCase
     {
         parent::setUp();
         $this->baseUrl = config('payment.sipay.credentials.host');
-        //$this->mockResponse('auth_response.json', 'ccpayment/api/token');
     }
 
-    private function mockResponse(string $fileName, $path): void
+    private function authMock(): void
+    {
+        $this->mockResponse('auth_response.json', 'ccpayment/api/token');
+    }
+
+    private function mockResponse(string $fileName, string $path, int $status = 200): void
     {
         Http::fake([
-            $this->baseUrl . '/' . $path => Http::response($this->jsonToArray($fileName), 200)
+            $this->baseUrl . '/' . $path => Http::response($this->jsonToArray($fileName), $status)
         ]);
     }
 
@@ -31,16 +36,26 @@ class SipayPaymentTest extends TestCase
         return json_decode(file_get_contents(__DIR__ . '/../FakeResponses/Sipay/' . $fileName), true);
     }
 
+    public function test_authentication_with_failed_response()
+    {
+        $this->mockResponse('auth_failed_response.json', 'ccpayment/api/token');
+        $this->assertThrows(fn() => Payment::gateway('sipay')
+            ->getCards(['customer_number' => 123123]), AuthTokenException::class);
+    }
+
     public function test_get_card_list_method()
     {
+        $this->authMock();
         $this->mockResponse('get_cards_response.json', 'ccpayment/api/getCardTokens');
         $response = Payment::gateway('sipay')
             ->getCards(['customer_number' => 123123]);
         $this->assertEquals($this->jsonToArray('get_cards_response.json'), $response->toArray());
+        $this->assertEquals(200, $response->getHttpStatusCode());
     }
 
     public function test_store_credit_card_method()
     {
+        $this->authMock();
         $this->mockResponse('save_cards_response.json', 'ccpayment/api/saveCard');
         $response = Payment::gateway('sipay')
             ->saveCard([
@@ -51,10 +66,12 @@ class SipayPaymentTest extends TestCase
                 'card_holder_name' => 'Vedat Ünlü'
             ]);
         $this->assertEquals($this->jsonToArray('save_cards_response.json'), $response->toArray());
+        $this->assertEquals(200, $response->getHttpStatusCode());
     }
 
     public function test_update_credit_card_method()
     {
+        $this->authMock();
         $this->mockResponse('update_cards_response.json', 'ccpayment/api/editCard');
         $response = Payment::gateway('sipay')
             ->updateCard([
@@ -65,10 +82,12 @@ class SipayPaymentTest extends TestCase
                 'card_holder_name' => 'Vedat Ünlü'
             ]);
         $this->assertEquals($this->jsonToArray('update_cards_response.json'), $response->toArray());
+        $this->assertEquals(200, $response->getHttpStatusCode());
     }
 
     public function test_delete_credit_card_method()
     {
+        $this->authMock();
         $this->mockResponse('delete_cards_response.json', 'ccpayment/api/deleteCard');
         $response = Payment::gateway('sipay')
             ->deleteCard([
@@ -76,10 +95,12 @@ class SipayPaymentTest extends TestCase
                 'customer_number' => 123123
             ]);
         $this->assertEquals($this->jsonToArray('delete_cards_response.json'), $response->toArray());
+        $this->assertEquals(200, $response->getHttpStatusCode());
     }
 
     public function test_pay_with_3DS_method()
     {
+        $this->authMock();
         Http::fake([
             $this->baseUrl.'/ccpayment/api/paySmart3D' => Http::response("<form>form</form>", 200)
         ]);
@@ -110,11 +131,13 @@ class SipayPaymentTest extends TestCase
                 'response_method' => 'POST'
             ]);
 
-        $this->assertStringContainsString('form', $response->get3DSForm());
+        $this->assertStringContainsString('<form>', $response->get3DSForm());
+        $this->assertEquals(200, $response->getHttpStatusCode());
     }
 
     public function test_pay_with_saved_card_method()
     {
+        $this->authMock();
         Http::fake([
             $this->baseUrl.'/ccpayment/api/payByCardToken' => Http::response("<form>form</form>", 200)
         ]);
@@ -145,10 +168,12 @@ class SipayPaymentTest extends TestCase
                 'response_method' => 'POST'
             ]);
         $this->assertStringContainsString('form', $response->get3DSForm());
+        $this->assertEquals(200, $response->getHttpStatusCode());
     }
 
     public function test_refund_method()
     {
+        $this->authMock();
         $this->mockResponse('refund_response.json', 'ccpayment/api/refund');
         $response = Payment::gateway('sipay')
             ->refund([
@@ -157,10 +182,12 @@ class SipayPaymentTest extends TestCase
                 'refund_transaction_id' => 's2345g54h3ıh'
             ]);
         $this->assertEquals($this->jsonToArray('refund_response.json'), $response->toArray());
+        $this->assertEquals(200, $response->getHttpStatusCode());
     }
 
     public function test_installment_inquiry_method()
     {
+        $this->authMock();
         $this->mockResponse('installment_inquiry_response.json', 'ccpayment/api/getpos');
         $response = Payment::gateway('sipay')
             ->installmentInquiry([
@@ -171,10 +198,12 @@ class SipayPaymentTest extends TestCase
                 "is_2d" => 0
             ]);
         $this->assertEquals($this->jsonToArray('installment_inquiry_response.json'), $response->toArray());
+        $this->assertEquals(200, $response->getHttpStatusCode());
     }
 
     public function test_pay_with_2D_method()
     {
+        $this->authMock();
         $this->mockResponse('pay_with_2D_response.json', 'ccpayment/api/paySmart2D');
         $response = Payment::gateway('sipay')
             ->payWith2D([
@@ -206,6 +235,7 @@ class SipayPaymentTest extends TestCase
 
     public function test_verify_payment_method()
     {
+        $this->authMock();
         $this->mockResponse('verify_payment_response.json', 'ccpayment/api/confirmPayment');
         $response = Payment::gateway('sipay')
             ->verifyPayment([
@@ -218,6 +248,7 @@ class SipayPaymentTest extends TestCase
 
     public function test_transaction_status_method()
     {
+        $this->authMock();
         $this->mockResponse('transaction_status_response.json', 'ccpayment/api/checkStatus');
         $response = Payment::gateway('sipay')
             ->transactionStatus([
@@ -235,13 +266,12 @@ class SipayPaymentTest extends TestCase
 
     public function test_payment_validator_method_with_valid_gateway()
     {
-        $hashKey = '4cce8ad2aa98d2a6:f318:eur9Zwx6Tkya3Ek5Az15mYVuoAbYjNvc93Kf5D2ISms1GSaR9gVz7opUuUArAFDqHzp+EZ63Zfxt__xfbk2a+y8u5otXHr89zNv2VzGzJrL4=';
-        $response = Payment::validate('sipay', $hashKey);
-        $this->assertArrayHasKey('status', $response);
+        $response = Payment::validate('sipay', 'test');
+        $this->assertFalse($response);
     }
 
     public function test_payment_validator_method_with_invalid_gateway()
     {
-        $this->assertThrows(fn () => Payment::validate('test', 'test'), InvalidGatewayValidatorException::class);
+        $this->assertThrows(fn() => Payment::validate('test', 'test'), InvalidGatewayValidatorException::class);
     }
 }

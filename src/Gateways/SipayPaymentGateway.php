@@ -4,7 +4,7 @@ namespace Unlu\PaymentPackage\Gateways;
 
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
-use Unlu\PaymentPackage\Abstract\PaymentGateway;
+use Unlu\PaymentPackage\Abstracts\PaymentGateway;
 use Unlu\PaymentPackage\Contracts\Installable;
 use Unlu\PaymentPackage\Contracts\NonSecurePayable;
 use Unlu\PaymentPackage\Contracts\PaymentGatewayResponse;
@@ -25,11 +25,6 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
      * @var string
      */
     private string $appKey;
-
-    /**
-     * @var string
-     */
-    protected string $authToken;
 
     /**
      * @var SipayPayload
@@ -159,7 +154,7 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
                     'app_id' => $this->appKey,
                     'app_secret' => $this->appSecret,
                 ]);
-            if (!$response->successful()) throw new AuthTokenException($response->body());
+            if (!$response->successful() || !$response->json('data.token')) throw new AuthTokenException($response->body());
             Cache::put('sipay_token', $response->json('data.token'), $response->json('data.expires_at'));
         }
 
