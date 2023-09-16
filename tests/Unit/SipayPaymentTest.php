@@ -139,7 +139,7 @@ class SipayPaymentTest extends TestCase
     {
         $this->authMock();
         Http::fake([
-            $this->baseUrl . 'api/payByCardToken' => Http::response("<form>form</form>", 200)
+            $this->baseUrl.'/ccpayment/api/payByCardToken' => Http::response("<form>form</form>", 200)
         ]);
         $response = Payment::gateway('sipay')
             ->payWithSavedCard([
@@ -167,7 +167,6 @@ class SipayPaymentTest extends TestCase
                 'return_url' => 'http://localhost:8000/success',
                 'response_method' => 'POST'
             ]);
-
         $this->assertStringContainsString('form', $response->get3DSForm());
         $this->assertEquals(200, $response->getHttpStatusCode());
     }
@@ -200,6 +199,63 @@ class SipayPaymentTest extends TestCase
             ]);
         $this->assertEquals($this->jsonToArray('installment_inquiry_response.json'), $response->toArray());
         $this->assertEquals(200, $response->getHttpStatusCode());
+    }
+
+    public function test_pay_with_2D_method()
+    {
+        $this->authMock();
+        $this->mockResponse('pay_with_2D_response.json', 'ccpayment/api/paySmart2D');
+        $response = Payment::gateway('sipay')
+            ->payWith2D([
+                'cc_holder_name' => 'Vedat Ünlü',
+                'cc_no' => '4508034508034509',
+                'expiry_month' => '12',
+                'expiry_year' => '2026',
+                'cvv' => '000',
+                'currency_code' => 'TRY',
+                'installments_number' => 1,
+                'invoice_id' => rand(100000, 999999),
+                'invoice_description' => 'invoice_description',
+                'name' => 'Vedat',
+                'surname' => 'Ünlü',
+                'total' => 101.10,
+                'items' => json_encode([
+                    [
+                        'name' => 'Item 2',
+                        'price' => 101.10,
+                        'quantity' => 1,
+                        'description' => "item description"
+                    ]
+                ]),
+                'cancel_url' => 'http://localhost:8000/fail',
+                'return_url' => 'http://localhost:8000/success'
+            ]);
+        $this->assertEquals($this->jsonToArray('pay_with_2D_response.json'), $response->toArray());
+    }
+
+    public function test_verify_payment_method()
+    {
+        $this->authMock();
+        $this->mockResponse('verify_payment_response.json', 'ccpayment/api/confirmPayment');
+        $response = Payment::gateway('sipay')
+            ->verifyPayment([
+                "invoice_id" => "Cs2Ghy621dsa42f1D2",
+                "status" => 1,
+                "total" => 10.25
+            ]);
+        $this->assertEquals($this->jsonToArray('verify_payment_response.json'), $response->toArray());
+    }
+
+    public function test_transaction_status_method()
+    {
+        $this->authMock();
+        $this->mockResponse('transaction_status_response.json', 'ccpayment/api/checkStatus');
+        $response = Payment::gateway('sipay')
+            ->transactionStatus([
+                "invoice_id" => "Cs2Ghy621dsa42f1D2",
+                "include_pending_status" => true,
+            ]);
+        $this->assertEquals($this->jsonToArray('transaction_status_response.json'), $response->toArray());
     }
 
     public function test_payment_factory_with_invalid_gateway()

@@ -6,6 +6,7 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
 use Unlu\PaymentPackage\Abstracts\PaymentGateway;
 use Unlu\PaymentPackage\Contracts\Installable;
+use Unlu\PaymentPackage\Contracts\NonSecurePayable;
 use Unlu\PaymentPackage\Contracts\PaymentGatewayResponse;
 use Unlu\PaymentPackage\Contracts\Refundable;
 use Unlu\PaymentPackage\Contracts\Walletable;
@@ -13,7 +14,7 @@ use Unlu\PaymentPackage\Payloads\SipayPayload;
 use Unlu\PaymentPackage\Responses\SipayResponse;
 use Unlu\PaymentPackage\Exceptions\AuthTokenException;
 
-class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundable, Installable
+class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundable, Installable, NonSecurePayable
 {
     /**
      * @var string
@@ -170,6 +171,48 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/getpos', $this->payload->setData($params)->toArray());
+
+        return new SipayResponse($response);
+    }
+
+    /**
+     * Make a non secure payment request
+     *
+     * @param array $params
+     * @return PaymentGatewayResponse
+     */
+    public function payWith2D(array $params): PaymentGatewayResponse
+    {
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
+            ->post('ccpayment/api/paySmart2D', $this->payload->setData($params)->addHashKey('payment')->toArray());
+
+        return new SipayResponse($response);
+    }
+
+    /**
+     * Make a request to verify payment
+     *
+     * @param array $params
+     * @return PaymentGatewayResponse
+     */
+    public function verifyPayment(array $params): PaymentGatewayResponse
+    {
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
+            ->post('ccpayment/api/confirmPayment', $this->payload->setData($params)->addHashKey('verification')->toArray());
+
+        return new SipayResponse($response);
+    }
+
+    /**
+     * Make a request for the status of the transaction
+     *
+     * @param array $params
+     * @return PaymentGatewayResponse
+     */
+    public function transactionStatus(array $params): PaymentGatewayResponse
+    {
+        $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
+            ->post('ccpayment/api/checkStatus', $this->payload->setData($params)->addHashKey('transaction')->toArray());
 
         return new SipayResponse($response);
     }
