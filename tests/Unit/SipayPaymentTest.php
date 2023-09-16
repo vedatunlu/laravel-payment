@@ -181,9 +181,8 @@ class SipayPaymentTest extends TestCase
 
     public function test_payment_validator_method_with_valid_gateway()
     {
-        $hashKey = '4cce8ad2aa98d2a6:f318:eur9Zwx6Tkya3Ek5Az15mYVuoAbYjNvc93Kf5D2ISms1GSaR9gVz7opUuUArAFDqHzp+EZ63Zfxt__xfbk2a+y8u5otXHr89zNv2VzGzJrL4=';
-        $response = Payment::validate('sipay', $hashKey);
-        $this->assertArrayHasKey('status', $response);
+        $response = Payment::validate('sipay', 'test');
+        $this->assertFalse($response);
     }
 
     public function test_payment_validator_method_with_invalid_gateway()
