@@ -101,7 +101,7 @@ class SipayPaymentTest extends TestCase
     {
         $this->authMock();
         Http::fake([
-            $this->baseUrl => Http::response("<form>form</form>", 200)
+            $this->baseUrl.'/ccpayment/api/paySmart3D' => Http::response("<form>form</form>", 200)
         ]);
         $response = Payment::gateway('sipay')
             ->payWith3D([
