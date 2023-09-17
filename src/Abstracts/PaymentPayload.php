@@ -2,7 +2,9 @@
 
 namespace Unlu\PaymentPackage\Abstracts;
 
-abstract class PaymentPayload
+use Unlu\PaymentPackage\Contracts\IPaymentPayload;
+
+abstract class PaymentPayload implements IPaymentPayload
 {
 
     /**

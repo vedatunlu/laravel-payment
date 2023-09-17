@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Cache;
 use Unlu\PaymentPackage\Abstracts\PaymentGateway;
 use Unlu\PaymentPackage\Contracts\Installable;
 use Unlu\PaymentPackage\Contracts\NonSecurePayable;
-use Unlu\PaymentPackage\Contracts\PaymentGatewayResponse;
 use Unlu\PaymentPackage\Contracts\Refundable;
 use Unlu\PaymentPackage\Contracts\Walletable;
 use Unlu\PaymentPackage\Payloads\SipayPayload;
@@ -17,32 +16,30 @@ use Unlu\PaymentPackage\Exceptions\AuthTokenException;
 class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundable, Installable, NonSecurePayable
 {
     /**
+     * Sipay merchant app secret key
+     *
      * @var string
      */
     private string $appSecret;
 
     /**
+     * Sipay merchant app key
+     *
      * @var string
      */
     private string $appKey;
 
     /**
-     * @var SipayPayload
+     * @param SipayPayload $payload
+     * @param PendingRequest $client
+     * @param string $appSecret
+     * @param string $appKey
      */
-    protected SipayPayload $payload;
-
-    /**
-     * @var PendingRequest
-     */
-    protected PendingRequest $client;
-
-    public function __construct(SipayPayload $payload, PendingRequest $client, $appSecret, $appKey)
+    public function __construct(SipayPayload $payload, PendingRequest $client, string $appSecret, string $appKey)
     {
-        $this->client = $client;
         $this->appSecret = $appSecret;
         $this->appKey = $appKey;
-        $this->payload = $payload;
-        parent::__construct();
+        parent::__construct($payload, $client);
     }
 
     /**
@@ -165,9 +162,9 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
      * Make a request to inquiry installment for given credit card
      *
      * @param array $params
-     * @return PaymentGatewayResponse
+     * @return SipayResponse
      */
-    public function installmentInquiry(array $params): PaymentGatewayResponse
+    public function installmentInquiry(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/getpos', $this->payload->setData($params)->toArray());
@@ -179,9 +176,9 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
      * Make a non secure payment request
      *
      * @param array $params
-     * @return PaymentGatewayResponse
+     * @return SipayResponse
      */
-    public function payWith2D(array $params): PaymentGatewayResponse
+    public function payWith2D(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/paySmart2D', $this->payload->setData($params)->addHashKey('payment')->toArray());
@@ -193,9 +190,9 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
      * Make a request to verify payment
      *
      * @param array $params
-     * @return PaymentGatewayResponse
+     * @return SipayResponse
      */
-    public function verifyPayment(array $params): PaymentGatewayResponse
+    public function verifyPayment(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/confirmPayment', $this->payload->setData($params)->addHashKey('verification')->toArray());
@@ -207,9 +204,9 @@ class SipayPaymentGateway extends PaymentGateway implements Walletable, Refundab
      * Make a request for the status of the transaction
      *
      * @param array $params
-     * @return PaymentGatewayResponse
+     * @return SipayResponse
      */
-    public function transactionStatus(array $params): PaymentGatewayResponse
+    public function transactionStatus(array $params): SipayResponse
     {
         $response = $this->client->acceptJson()->asJson()->withToken($this->authToken)
             ->post('ccpayment/api/checkStatus', $this->payload->setData($params)->addHashKey('transaction')->toArray());

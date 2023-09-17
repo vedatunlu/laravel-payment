@@ -4,9 +4,9 @@ namespace Unlu\PaymentPackage\Contracts;
 
 interface NonSecurePayable
 {
-    public function payWith2D(array $params): PaymentGatewayResponse;
+    public function payWith2D(array $params): IPaymentGatewayResponse;
 
-    public function verifyPayment(array $params): PaymentGatewayResponse;
+    public function verifyPayment(array $params): IPaymentGatewayResponse;
 
-    public function transactionStatus(array $params): PaymentGatewayResponse;
+    public function transactionStatus(array $params): IPaymentGatewayResponse;
 }

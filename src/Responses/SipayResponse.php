@@ -2,26 +2,11 @@
 
 namespace Unlu\PaymentPackage\Responses;
 
-use Illuminate\Http\Client\Response;
-use Unlu\PaymentPackage\Contracts\PaymentGatewayResponse;
+use Unlu\PaymentPackage\Abstracts\PaymentGatewayResponse;
 use Unlu\PaymentPackage\Exceptions\InvalidResponseException;
 
-class SipayResponse implements PaymentGatewayResponse
+class SipayResponse extends PaymentGatewayResponse
 {
-    /**
-     * @var Response
-     */
-    protected mixed $response;
-
-    /**
-     * @var int
-     */
-    public int $httpStatusCode;
-
-    public function __construct(Response $response)
-    {
-        $this->response = $response;
-    }
 
     /**
      * Get sipay response's status code as int

@@ -2,7 +2,7 @@
 
 namespace Unlu\PaymentPackage\Contracts;
 
-interface PaymentGatewayResponse
+interface IPaymentGatewayResponse
 {
 
     public function getHttpStatusCode(): int;
