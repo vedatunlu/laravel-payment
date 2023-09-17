@@ -4,5 +4,5 @@ namespace Unlu\PaymentPackage\Contracts;
 
 interface Installable
 {
-    public function installmentInquiry(array $params): PaymentGatewayResponse;
+    public function installmentInquiry(array $params): IPaymentGatewayResponse;
 }

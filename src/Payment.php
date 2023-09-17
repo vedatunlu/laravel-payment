@@ -3,13 +3,13 @@
 namespace Unlu\PaymentPackage;
 
 use Illuminate\Support\Facades\App;
-use Unlu\PaymentPackage\Abstracts\PaymentGateway;
+use Unlu\PaymentPackage\Contracts\IPaymentGateWay;
 use Unlu\PaymentPackage\Exceptions\InvalidGatewayException;
 use Unlu\PaymentPackage\Exceptions\InvalidGatewayValidatorException;
 use Unlu\PaymentPackage\Gateways\SipayPaymentGateway;
 use Unlu\PaymentPackage\Helpers\SipayHashKeyValidator;
 
-final class Payment
+class Payment
 {
     private static array $gateWays = [
         'sipay' => SipayPaymentGateway::class
@@ -26,10 +26,10 @@ final class Payment
      * Set online payment channel
      *
      * @param  string  $gateway
-     * @return PaymentGateway
+     * @return IPaymentGateWay
      * @throws InvalidGatewayException
      */
-    public static function gateway(string $gateway): PaymentGateway
+    public static function gateway(string $gateway): IPaymentGateWay
     {
         self::gateWayExists($gateway);
         return App::make(self::$gateWays[$gateway]);

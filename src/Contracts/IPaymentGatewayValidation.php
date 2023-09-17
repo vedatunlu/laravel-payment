@@ -2,7 +2,7 @@
 
 namespace Unlu\PaymentPackage\Contracts;
 
-interface PaymentGatewayValidation
+interface IPaymentGatewayValidation
 {
     public function validateHashKey(string $hashKey): mixed;
 }

@@ -2,9 +2,9 @@
 
 namespace Unlu\PaymentPackage\Helpers;
 
-use Unlu\PaymentPackage\Contracts\PaymentGatewayValidation;
+use Unlu\PaymentPackage\Contracts\IPaymentGatewayValidation;
 
-final class SipayHashKeyValidator implements PaymentGatewayValidation
+final class SipayHashKeyValidator implements IPaymentGatewayValidation
 {
 
     /**
